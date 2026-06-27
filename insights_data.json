@@ -1,0 +1,66 @@
+[
+  {
+    "regiao": "Zona Norte — São Paulo",
+    "concentracao": 85,
+    "cobertura_rede": "5G",
+    "perfis_disponiveis": 350,
+    "lat_centro": -23.49,
+    "lng_centro": -46.62
+  },
+  {
+    "regiao": "Zona Leste — São Paulo",
+    "concentracao": 72,
+    "cobertura_rede": "4G",
+    "perfis_disponiveis": 280,
+    "lat_centro": -23.54,
+    "lng_centro": -46.48
+  },
+  {
+    "regiao": "Centro — Rio de Janeiro",
+    "concentracao": 68,
+    "cobertura_rede": "4G",
+    "perfis_disponiveis": 210,
+    "lat_centro": -22.91,
+    "lng_centro": -43.17
+  },
+  {
+    "regiao": "Pelourinho — Salvador",
+    "concentracao": 55,
+    "cobertura_rede": "4G",
+    "perfis_disponiveis": 175,
+    "lat_centro": -12.97,
+    "lng_centro": -38.50
+  },
+  {
+    "regiao": "Boa Viagem — Recife",
+    "concentracao": 61,
+    "cobertura_rede": "5G",
+    "perfis_disponiveis": 195,
+    "lat_centro": -8.11,
+    "lng_centro": -34.90
+  },
+  {
+    "regiao": "Centro — Fortaleza",
+    "concentracao": 48,
+    "cobertura_rede": "3G",
+    "perfis_disponiveis": 140,
+    "lat_centro": -3.71,
+    "lng_centro": -38.54
+  },
+  {
+    "regiao": "Centro — Manaus",
+    "concentracao": 38,
+    "cobertura_rede": "3G",
+    "perfis_disponiveis": 95,
+    "lat_centro": -3.10,
+    "lng_centro": -60.02
+  },
+  {
+    "regiao": "Savassi — Belo Horizonte",
+    "concentracao": 63,
+    "cobertura_rede": "4G",
+    "perfis_disponiveis": 220,
+    "lat_centro": -19.93,
+    "lng_centro": -43.93
+  }
+]
