@@ -1,9 +1,39 @@
 import json
+import os
+import psycopg2
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
+
+DATABASE_URL = os.environ.get(
+    "DATABASE_URL",
+    "postgresql://neondb_owner:npg_PCWu4Qmrjq7x@ep-flat-darkness-attoqapn.c-9.us-east-1.aws.neon.tech/neondb?sslmode=require"
+)
+
+def get_db():
+    return psycopg2.connect(DATABASE_URL)
+
+def init_db():
+    try:
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS survey_respostas (
+                id SERIAL PRIMARY KEY,
+                momento VARCHAR(50) NOT NULL,
+                p1 INTEGER, p2 INTEGER, p3 INTEGER, p4 INTEGER, p5 INTEGER,
+                criado_em TIMESTAMP DEFAULT NOW()
+            )
+        """)
+        conn.commit()
+        cur.close()
+        conn.close()
+    except Exception as e:
+        print(f"Erro ao inicializar banco: {e}")
+
+init_db()
 
 app = FastAPI(
     title="App BiT — API de Matching Inclusivo",
@@ -208,3 +238,74 @@ def get_insights():
 @app.get("/")
 def root():
     return {"status": "App BiT API online", "docs": "/docs"}
+
+
+# --- Survey de bem-estar ---
+
+class SurveyResposta(BaseModel):
+    momento: str  # "processo_seletivo" ou "mensal"
+    p1: int  # 1-5
+    p2: int
+    p3: int
+    p4: int
+    p5: int
+
+@app.post("/survey")
+def salvar_survey(resposta: SurveyResposta):
+    try:
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute(
+            "INSERT INTO survey_respostas (momento, p1, p2, p3, p4, p5) VALUES (%s, %s, %s, %s, %s, %s)",
+            (resposta.momento, resposta.p1, resposta.p2, resposta.p3, resposta.p4, resposta.p5)
+        )
+        conn.commit()
+        cur.close()
+        conn.close()
+        return {"status": "ok", "mensagem": "Resposta registrada anonimamente. Obrigada!"}
+    except Exception as e:
+        return {"status": "erro", "mensagem": str(e)}
+
+@app.get("/survey/relatorio")
+def relatorio_survey(momento: str = "mensal"):
+    try:
+        conn = get_db()
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT AVG(p1), AVG(p2), AVG(p3), AVG(p4), AVG(p5), COUNT(*) FROM survey_respostas WHERE momento = %s",
+            (momento,)
+        )
+        row = cur.fetchone()
+        cur.close()
+        conn.close()
+
+        if not row or row[5] == 0:
+            return {"total_respostas": 0, "medias": None}
+
+        perguntas = [
+            "Como você avalia o nível de estresse neste processo?",
+            "Sentiu que foi tratado(a) com respeito?",
+            "As etapas foram claras e bem comunicadas?",
+            "Recomendaria esta empresa para outras pessoas?",
+            "Como está seu bem-estar geral no trabalho?",
+        ] if momento == "processo_seletivo" else [
+            "Como está seu nível de estresse no trabalho?",
+            "Sente que seu trabalho é reconhecido?",
+            "Tem equilíbrio entre vida pessoal e profissional?",
+            "Sente pertencimento e inclusão na equipe?",
+            "Como avalia seu bem-estar geral este mês?",
+        ]
+
+        medias = []
+        for i, pergunta in enumerate(perguntas):
+            media = round(float(row[i]), 1) if row[i] else 0
+            medias.append({"pergunta": pergunta, "media": media, "max": 5})
+
+        return {
+            "momento": momento,
+            "total_respostas": int(row[5]),
+            "medias": medias,
+            "nota_anonimato": "Respostas anônimas — nenhum dado individual é compartilhado com a empresa."
+        }
+    except Exception as e:
+        return {"status": "erro", "mensagem": str(e)}
