@@ -1,6 +1,6 @@
 import json
 import os
-import psycopg2
+import psycopg
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,7 +13,7 @@ DATABASE_URL = os.environ.get(
 )
 
 def get_db():
-    return psycopg2.connect(DATABASE_URL)
+    return psycopg.connect(DATABASE_URL)
 
 def init_db():
     try:
