@@ -211,9 +211,11 @@ def match_candidatos(req: MatchRequest):
             "nome": "Candidato(a) #" + str(c["candidato_id"]) if req.filtros.anti_vies else c["nome"],
             "idade": None if req.filtros.anti_vies else c["idade"],
             "foto": None if req.filtros.anti_vies else c["foto"],
+            "funcao_desejada": c.get("funcao_desejada", ""),
             "score_match": score,
             "badge_diversidade": c["badge_diversidade"],
             "skills": c["skills"],
+            "soft_skills": c.get("soft_skills", []),
             "lat": c["lat"],
             "lng": c["lng"],
             "motivo": gerar_motivo(c, req.vaga),
@@ -233,6 +235,45 @@ def match_candidatos(req: MatchRequest):
         "total_analisados": len(CANDIDATOS),
         "diversidade_resultado": pct_diversidade
     }
+
+
+@app.get("/vagas")
+def listar_vagas():
+    """Lista todas as vagas com contagem de candidatos aptos (score >= 40)."""
+    resultado = []
+    for vaga in VAGAS:
+        v = Vaga(
+            titulo=vaga["titulo"],
+            skills=vaga["skills"],
+            nivel=vaga["nivel"],
+            regiao=vaga["regiao"]
+        )
+        aptos = []
+        for c in CANDIDATOS:
+            score = calcular_score_match(c, v)
+            if score >= 40:
+                score_div = calcular_score_diversidade(c, None)
+                aptos.append({"candidato_id": c["candidato_id"], "score": score, "score_div": score_div, "badge": c["badge_diversidade"]})
+
+        total_aptos = len(aptos)
+        pct_diversidade = int(sum(1 for a in aptos if a["badge"]) / total_aptos * 100) if total_aptos else 0
+
+        resultado.append({
+            "vaga_id": vaga["vaga_id"],
+            "titulo": vaga["titulo"],
+            "empresa": vaga["empresa"],
+            "nivel": vaga["nivel"],
+            "regiao": vaga["regiao"],
+            "descricao": vaga["descricao"],
+            "skills": vaga["skills"],
+            "metas_esg": vaga.get("metas_esg", []),
+            "total_candidatos_aptos": total_aptos,
+            "percentual_diversidade": pct_diversidade,
+            "top_candidatos": sorted(aptos, key=lambda x: (x["score"], x["score_div"]), reverse=True)[:3]
+        })
+
+    resultado.sort(key=lambda x: x["total_candidatos_aptos"], reverse=True)
+    return {"vagas": resultado, "total": len(resultado)}
 
 
 @app.get("/insights")
