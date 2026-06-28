@@ -1,0 +1,82 @@
+[
+  {
+    "vaga_id": 1,
+    "titulo": "Desenvolvedora Frontend",
+    "empresa": "Lumen S.A.",
+    "skills": ["react", "typescript", "css", "figma"],
+    "nivel": "pleno",
+    "regiao": "florianópolis",
+    "descricao": "Vaga para compor time de produto focado em acessibilidade e design inclusivo.",
+    "metas_esg": ["genero", "raca", "pcd"]
+  },
+  {
+    "vaga_id": 2,
+    "titulo": "Analista de Dados",
+    "empresa": "Vísent Tech",
+    "skills": ["python", "sql", "pandas", "power bi"],
+    "nivel": "junior",
+    "regiao": "florianópolis",
+    "descricao": "Análise de dados de mobilidade urbana e cobertura de rede para projetos ESG.",
+    "metas_esg": ["raca", "lgbtqia"]
+  },
+  {
+    "vaga_id": 3,
+    "titulo": "UX Designer",
+    "empresa": "ImpactoSC",
+    "skills": ["figma", "pesquisa de usuário", "prototipação", "acessibilidade"],
+    "nivel": "pleno",
+    "regiao": "são josé",
+    "descricao": "Design centrado em pessoas com foco em inclusão digital.",
+    "metas_esg": ["pcd", "genero", "50mais"]
+  },
+  {
+    "vaga_id": 4,
+    "titulo": "Desenvolvedora Backend",
+    "empresa": "StartupFloripa",
+    "skills": ["python", "fastapi", "postgresql", "docker"],
+    "nivel": "senior",
+    "regiao": "florianópolis",
+    "descricao": "Arquitetura de APIs para plataforma de impacto social.",
+    "metas_esg": ["genero", "raca"]
+  },
+  {
+    "vaga_id": 5,
+    "titulo": "Assistente de Marketing Digital",
+    "empresa": "Cooperativa Sul",
+    "skills": ["redes sociais", "copywriting", "canva", "email marketing"],
+    "nivel": "junior",
+    "regiao": "palhoça",
+    "descricao": "Comunicação digital para cooperativa de economia solidária.",
+    "metas_esg": ["indigena", "raca", "50mais"]
+  },
+  {
+    "vaga_id": 6,
+    "titulo": "Engenheira de Machine Learning",
+    "empresa": "DataBridge",
+    "skills": ["python", "machine learning", "pandas", "scikit-learn"],
+    "nivel": "senior",
+    "regiao": "florianópolis",
+    "descricao": "Modelos preditivos para análise de risco socioambiental.",
+    "metas_esg": ["genero", "lgbtqia", "pcd"]
+  },
+  {
+    "vaga_id": 7,
+    "titulo": "Suporte Técnico",
+    "empresa": "ConectaFloripa",
+    "skills": ["atendimento ao cliente", "windows", "redes", "helpdesk"],
+    "nivel": "junior",
+    "regiao": "são josé",
+    "descricao": "Suporte a comunidades em situação de vulnerabilidade digital.",
+    "metas_esg": ["pcd", "50mais", "raca"]
+  },
+  {
+    "vaga_id": 8,
+    "titulo": "Gestora de Projetos",
+    "empresa": "ESGHub",
+    "skills": ["gestão de projetos", "scrum", "excel", "comunicação"],
+    "nivel": "pleno",
+    "regiao": "florianópolis",
+    "descricao": "Coordenação de iniciativas de impacto socioambiental.",
+    "metas_esg": ["genero", "raca", "indigena"]
+  }
+]

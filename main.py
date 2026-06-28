@@ -54,6 +54,8 @@ app.add_middleware(
 BASE_DIR = Path(__file__).parent
 with open(BASE_DIR / "candidatos.json", encoding="utf-8") as f:
     CANDIDATOS = json.load(f)
+with open(BASE_DIR / "vagas.json", encoding="utf-8") as f:
+    VAGAS = json.load(f)
 
 # Carrega dados reais do CDRView (Vísent / Anatel)
 def carregar_insights_cdrview():
@@ -241,6 +243,68 @@ def get_insights():
 @app.get("/")
 def root():
     return {"status": "App BiT API online", "docs": "/docs"}
+
+
+# --- Matching B2C (candidato → vagas) ---
+
+class PerfilCandidato(BaseModel):
+    skills: List[str]
+    nivel: str
+    regiao: str
+    dimensoes_diversidade: Optional[List[str]] = []
+
+@app.post("/match/candidato")
+def match_vagas_para_candidato(perfil: PerfilCandidato):
+    skills_candidato = set(s.lower() for s in perfil.skills)
+    resultados = []
+
+    for vaga in VAGAS:
+        skills_vaga = set(s.lower() for s in vaga["skills"])
+        skills_em_comum = skills_candidato & skills_vaga
+        if not skills_em_comum:
+            continue
+
+        score = 0
+        if skills_vaga:
+            score += int((len(skills_em_comum) / len(skills_vaga)) * 60)
+        if perfil.nivel.lower() == vaga["nivel"].lower():
+            score += 25
+        if perfil.regiao.lower() == vaga["regiao"].lower():
+            score += 15
+        score = min(score, 100)
+
+        skills_faltando = list(skills_vaga - skills_candidato)
+        motivo_partes = [f"{len(skills_em_comum)} de {len(skills_vaga)} skills compatíveis."]
+        if perfil.nivel.lower() == vaga["nivel"].lower():
+            motivo_partes.append("Nível alinhado.")
+        else:
+            motivo_partes.append(f"Nível divergente (seu perfil: {perfil.nivel}, vaga: {vaga['nivel']}).")
+        if skills_faltando:
+            motivo_partes.append(f"Skills que você pode desenvolver: {', '.join(skills_faltando)}.")
+
+        alinhamento_esg = [d for d in perfil.dimensoes_diversidade if d in vaga.get("metas_esg", [])]
+
+        resultados.append({
+            "vaga_id": vaga["vaga_id"],
+            "titulo": vaga["titulo"],
+            "empresa": vaga["empresa"],
+            "nivel": vaga["nivel"],
+            "regiao": vaga["regiao"],
+            "descricao": vaga["descricao"],
+            "skills_vaga": vaga["skills"],
+            "skills_em_comum": list(skills_em_comum),
+            "score_compatibilidade": score,
+            "motivo": " ".join(motivo_partes),
+            "alinhamento_esg": alinhamento_esg,
+            "metas_esg_empresa": vaga.get("metas_esg", [])
+        })
+
+    resultados.sort(key=lambda x: x["score_compatibilidade"], reverse=True)
+    return {
+        "vagas_recomendadas": resultados,
+        "total_analisadas": len(VAGAS),
+        "total_com_match": len(resultados)
+    }
 
 
 # --- Survey de bem-estar ---
